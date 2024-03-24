@@ -22,4 +22,4 @@ jobs:
         with:
           dockerfile: Dockerfile
           recursive: true
-          config: .github/linters/.hadolint.yaml
+#          config: .github/linters/.hadolint.yaml
