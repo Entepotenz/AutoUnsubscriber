@@ -65,6 +65,7 @@ words = ['unsubscribe', 'subscription', 'optout']
 
 class AutoUnsubscriber():
     def __init__(self):
+        self.words = None
         self.email = ''
         self.user = None
         self.password = ''
@@ -133,7 +134,7 @@ class AutoUnsubscriber():
             print('\nLog in successful\n')
             return True
         except:
-            print('\nAn error occured while attempting to log in, please try again\n')
+            print('\nAn error occurred while attempting to log in, please try again\n')
             return False
 
     '''Attempt to log in to server. On failure, force user to re-enter info'''
@@ -142,7 +143,7 @@ class AutoUnsubscriber():
         if self.email == '':
             self.getInfo()
         attempt = self.login(readonly)
-        if attempt == False:
+        if not attempt:
             self.newEmail()
             self.accessServer(readonly)
 
@@ -215,13 +216,13 @@ class AutoUnsubscriber():
     '''Display info about which providers links were/were not found for'''
 
     def displayEmailInfo(self):
-        if self.noLinkList != []:
+        if self.noLinkList:
             print('Could not find unsubscribe links from these senders:')
             noList = '| '
             for i in range(len(self.noLinkList)):
                 noList += (str(self.noLinkList[i][0]) + ' | ')
             print(noList)
-        if self.senderList != []:
+        if self.senderList:
             print('\nFound unsubscribe links from these senders:')
             fullList = '| '
             for i in range(len(self.senderList)):
@@ -270,13 +271,13 @@ class AutoUnsubscriber():
     '''Navigate to selected unsubscribe, 10 at a time'''
 
     def openLinks(self):
-        if self.goToLinks != True:
+        if not self.goToLinks:
             print('\nNo unsubscribe links selected to naviagte to')
         else:
             print('\nUnsubscribe links will be opened 10 at a time')
             counter = 0
             for i in range(len(self.senderList)):
-                if self.senderList[i][3] == True:
+                if self.senderList[i][3]:
                     webbrowser.open(self.senderList[i][2])
                     counter += 1
                     if counter == 10:
@@ -298,7 +299,7 @@ class AutoUnsubscriber():
             self.login(False)
             DelTotal = 0
             for i in range(len(self.senderList)):
-                if self.senderList[i][4] == True:
+                if self.senderList[i][4]:
                     sender = str(self.senderList[i][1])
                     print('Searching for emails to delete from ' + sender)
                     '''Search for UID from selected providers'''
