@@ -40,13 +40,13 @@ serverD = {
     "ProtonMail": {"imap": "127.0.0.1", "domains": ["@protonmail.com", "@pm.me"]},
 }
 
-# Key words for unsubscribe link - add more if found
-words = ["unsubscribe", "subscription", "optout", "abbestellen", "abmelden"]
+# Keywords for unsubscribe link - add more if found
+WORDS = ["unsubscribe", "subscription", "optout", "abbestellen", "abmelden"]
 
 
 class AutoUnsubscriber:
     def __init__(self):
-        self.words = None
+        self.words = WORDS
         self.email = ""
         self.user = None
         self.password = ""
@@ -161,10 +161,10 @@ class AutoUnsubscriber:
                 url = False
                 # Parse html for elements with anchor tags
                 if html_piece := msg.html_part:
-                    html = html_piece.get_payload().decode("utf-8")
+                    html = html_piece.get_payload().decode("utf-8", errors='replace')
                     soup = bs4.BeautifulSoup(html, "html.parser")
                     elems = soup.select("a")
-                    # For each anchor tag, use regex to search for key words
+                    # For each anchor tag, use regex to search for keywords
                     elems.reverse()
                     # search starting at the bottom of email
                     for elem in elems:
