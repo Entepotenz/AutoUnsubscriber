@@ -162,7 +162,7 @@ class AutoUnsubscriber:
                 url = False
                 # Parse html for elements with anchor tags
                 if html_piece := msg.html_part:
-                    html = html_piece.get_payload().decode("utf-8", errors='replace')
+                    html = html_piece.get_payload().decode("utf-8", errors="replace")
                     soup = bs4.BeautifulSoup(html, "html.parser")
                     elems = soup.select("a")
                     # For each anchor tag, use regex to search for keywords
