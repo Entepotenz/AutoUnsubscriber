@@ -9,7 +9,7 @@ import re
 import sys
 import ssl
 
-"""List of accepted service providers and respective imap link"""
+# List of accepted service providers and respective imap link
 servers = [
     ("Gmail", "imap.gmail.com"),
     ("Outlook", "imap-mail.outlook.com"),
@@ -40,8 +40,8 @@ serverD = {
     "ProtonMail": {"imap": "127.0.0.1", "domains": ["@protonmail.com", "@pm.me"]},
 }
 
-"""Key words for unsubscribe link - add more if found"""
-words = ["unsubscribe", "subscription", "optout"]
+# Key words for unsubscribe link - add more if found
+words = ["unsubscribe", "subscription", "optout", "abbestellen", "abmelden"]
 
 
 class AutoUnsubscriber:
@@ -62,8 +62,7 @@ class AutoUnsubscriber:
         # TODO maybe add support for servers with a
         # company name different than their domain name...
 
-    """Get initial user info - email, password, and service provider"""
-
+    # Get initial user info - email, password, and service provider
     def getInfo(self):
         print(
             "This program searchs your email for junk mail to unsubscribe from and delete"
@@ -98,11 +97,10 @@ class AutoUnsubscriber:
                 print("\nTry a different account")
         self.password = getpass.getpass("Enter password for " + self.email + ": ")
 
-    """Log in to IMAP server, argument determines whether readonly or not"""
-
+    # Log in to IMAP server, argument determines whether readonly or not
     def login(self, read=True):
         try:
-            """ProtonMail Bridge Support - Requires unverified STARTTLS and changing ports"""
+            # ProtonMail Bridge Support - Requires unverified STARTTLS and changing ports
             if self.user[0] == "ProtonMail":
                 print(
                     "\nProtonMail require ProtonMail Bridge installed, make sure you've used the password Bridge gives you."
@@ -123,8 +121,7 @@ class AutoUnsubscriber:
             print("\nAn error occurred while attempting to log in, please try again\n")
             return False
 
-    """Attempt to log in to server. On failure, force user to re-enter info"""
-
+    # Attempt to log in to server. On failure, force user to re-enter info
     def accessServer(self, readonly=True):
         if self.email == "":
             self.getInfo()
@@ -133,11 +130,9 @@ class AutoUnsubscriber:
             self.newEmail()
             self.accessServer(readonly)
 
-    """Search for emails with unsubscribe in the body. If sender not already in
-    senderList, parse email for unsubscribe link. If link found, add name, email,
-    link (plus metadata for decisions) to senderList. If not, add to noLinkList.
-    """
-
+    # Search for emails with unsubscribe in the body. If sender not already in
+    # senderList, parse email for unsubscribe link. If link found, add name, email,
+    # link (plus metadata for decisions) to senderList. If not, add to noLinkList.
     def getEmails(self):
         print("Getting emails with unsubscribe in the body\n")
         UIDs = self.imap.search(["TEXT", "unsubscribe"])
@@ -155,37 +150,35 @@ class AutoUnsubscriber:
             for spammers in self.senderList:
                 if sender[0][1] in spammers:
                     trySender = False
-            """If not, search for link"""
+            # If not, search for link
             if trySender:
-                """Encode and decode to cp437 to handle unicode errors and get
-                rid of characters that can't be printed by Windows command line
-                which has default setting of cp437
-                """
+                # Encode and decode to cp437 to handle unicode errors and get
+                # rid of characters that can't be printed by Windows command line
+                # which has default setting of cp437
                 senderName = sender[0][0].encode("cp437", "ignore")
                 senderName = senderName.decode("cp437")
                 print("Searching for unsubscribe link from " + str(senderName))
                 url = False
-                """Parse html for elements with anchor tags"""
+                # Parse html for elements with anchor tags
                 if html_piece := msg.html_part:
                     html = html_piece.get_payload().decode("utf-8")
                     soup = bs4.BeautifulSoup(html, "html.parser")
                     elems = soup.select("a")
-                    """For each anchor tag, use regex to search for key words"""
+                    # For each anchor tag, use regex to search for key words
                     elems.reverse()
                     # search starting at the bottom of email
                     for elem in elems:
                         for word in self.words:
-                            """If one is found, get the url"""
+                            # If one is found, get the url
                             if re.match(word, str(elem), re.IGNORECASE):
                                 print("Link found")
                                 url = elem.get("href")
                                 break
                         if url:
                             break
-                """If link found, add info to senderList
-                format: (Name, email, link, go to link, delete emails)
-                If no link found, add to noLinkList
-                """
+                # If link found, add info to senderList
+                # format: (Name, email, link, go to link, delete emails)
+                # If no link found, add to noLinkList
                 if url:
                     self.senderList.append(
                         [senderName, sender[0][1], url, False, False]
@@ -201,8 +194,7 @@ class AutoUnsubscriber:
         print("\nLogging out of email server\n")
         self.imap.logout()
 
-    """Display info about which providers links were/were not found for"""
-
+    # Display info about which providers links were/were not found for
     def displayEmailInfo(self):
         if self.noLinkList:
             print("Could not find unsubscribe links from these senders:")
@@ -217,8 +209,7 @@ class AutoUnsubscriber:
                 fullList += str(self.senderList[i][0]) + " | "
             print(fullList)
 
-    """Allow user to decide which unsubscribe links to follow/emails to delete"""
-
+    # Allow user to decide which unsubscribe links to follow/emails to delete
     def decisions(self):
         def choice(userInput):
             if userInput.lower() == "y":
@@ -262,8 +253,7 @@ class AutoUnsubscriber:
                 else:
                     print("Invalid choice, please enter 'Y' or 'N'.\n")
 
-    """Navigate to selected unsubscribe, 10 at a time"""
-
+    # Navigate to selected unsubscribe, 10 at a time
     def openLinks(self):
         if not self.goToLinks:
             print("\nNo unsubscribe links selected to navigate to")
@@ -279,28 +269,26 @@ class AutoUnsubscriber:
                         cont = input("Press 'Enter' to continue: ")
                         counter = 0
 
-    """Log back into IMAP servers, NOT in readonly mode, and delete emails from
-    selected providers. Note: Deletes all emails from unsubscribed sender.
-    Emails from provider without unsubscribe in the body will be deleted.
-    """
-
+    # Log back into IMAP servers, NOT in readonly mode, and delete emails from
+    # selected providers. Note: Deletes all emails from unsubscribed sender.
+    # Emails from provider without unsubscribe in the body will be deleted.
     def deleteEmails(self):
         if not self.delEmails:
             print("\nNo emails selected to delete")
         else:
             print("\nLogging into email server to delete emails")
-            """Pass false to self.login() so as to NOT be in readonly mode"""
+            # Pass false to self.login() so as to NOT be in readonly mode
             self.login(False)
             DelTotal = 0
             for i in range(len(self.senderList)):
                 if self.senderList[i][4]:
                     sender = str(self.senderList[i][1])
                     print("Searching for emails to delete from " + sender)
-                    """Search for UID from selected providers"""
+                    # Search for UID from selected providers
                     DelUIDs = self.imap.search(["FROM", sender])
                     DelCount = 0
                     for DelUID in DelUIDs:
-                        """Delete emails from selected providers"""
+                        # Delete emails from selected providers
                         self.imap.delete_messages(DelUID)
                         self.imap.expunge()
                         DelCount += 1
@@ -315,18 +303,15 @@ class AutoUnsubscriber:
             print("\nLogging out of email server")
             self.imap.logout()
 
-    """For re-running on same email. Clear lists, reset flags, but use same info
-    for email, password, email provider, etc.
-    """
-
+    # For re-running on same email. Clear lists, reset flags, but use same info
+    # for email, password, email provider, etc.
     def runAgain(self):
         self.goToLinks = False
         self.delEmails = False
         self.senderList = []
         self.noLinkList = []
 
-    """Reset everything to get completely new user info"""
-
+    # Reset everything to get completely new user info
     def newEmail(self):
         self.email = ""
         self.user = None
@@ -334,10 +319,8 @@ class AutoUnsubscriber:
         self.imap = None
         self.runAgain()
 
-    """Called after program has run, allow user to run again on same email, run
-    on a different email, or quit the program
-    """
-
+    # Called after program has run, allow user to run again on same email, run
+    # on a different email, or quit the program
     def nextMove(self):
         print(
             "\nRun this program again on the same email, a different email, or quit?\n"
@@ -360,8 +343,7 @@ class AutoUnsubscriber:
             else:
                 print("\nInvalid choice, please enter 'A', 'D' or 'Q'.\n")
 
-    """Full set of program commands. Works whether it has user info or not"""
-
+    # Full set of program commands. Works whether it has user info or not
     def fullProcess(self):
         self.accessServer()
         self.getEmails()
@@ -372,8 +354,7 @@ class AutoUnsubscriber:
         else:
             print("No unsubscribe links detected")
 
-    """Loop to run program and not quit until told to by user or closed"""
-
+    # Loop to run program and not quit until told to by user or closed
     def usageLoop(self):
         self.fullProcess()
         while True:
