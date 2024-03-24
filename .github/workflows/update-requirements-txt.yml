@@ -1,0 +1,44 @@
+---
+name: update requirements.txt and requirements-dev.txt
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    strategy:
+      matrix:
+        python-version: ["3"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@716b1e13042866565e00e85fd4ec490e186c4a2f # v41.0.1
+        with:
+          files: |
+            poetry.lock
+            pyproject.toml
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: |
+          python -m pip install poetry
+          poetry self add poetry-plugin-export
+          poetry export --format requirements.txt --without dev --output requirements.txt
+          poetry export --format requirements.txt --with dev --output requirements-dev.txt
+      - uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d # v5.0.0
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        with:
+          file_pattern: "requirements*.txt"
+          commit_message: update requirements.txt and requirements-dev.txt
