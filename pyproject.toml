@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "autounsubscriber"
+version = "0.1.0"
+description = ""
+authors = ["F.K. <19738301+Entepotenz@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+getpass4 = "^0.0.14.1"
+bs4 = "^0.0.2"
+imapclient = "^3.0.1"
+regex = "^2023.12.25"
+syspath = "^3.0.6"
+pyopenssl = "^24.1.0"
+pyzmail39 = "^0.0.2"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
