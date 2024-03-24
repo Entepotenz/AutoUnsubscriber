@@ -139,7 +139,8 @@ class AutoUnsubscriber:
         raw = self.imap.fetch(UIDs, ["BODY[]"])
         print("Getting links and addresses\n")
         for UID in UIDs:
-            # If Body exists (resolves weird error with no body emails from Yahoo), then Get address and check if sender already in senderList
+            # If Body exists (resolves weird error with empty body emails from Yahoo),
+            # then Get address and check if sender already in senderList
             if b"BODY[]" in raw[UID]:
                 msg = pyzmail.PyzMessage.factory(raw[UID][b"BODY[]"])
             else:
