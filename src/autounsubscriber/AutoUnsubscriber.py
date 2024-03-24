@@ -63,7 +63,7 @@ serverD = {
 words = ['unsubscribe', 'subscription', 'optout']
 
 
-class AutoUnsubscriber():
+class AutoUnsubscriber:
     def __init__(self):
         self.words = None
         self.email = ''
@@ -272,7 +272,7 @@ class AutoUnsubscriber():
 
     def openLinks(self):
         if not self.goToLinks:
-            print('\nNo unsubscribe links selected to naviagte to')
+            print('\nNo unsubscribe links selected to navigate to')
         else:
             print('\nUnsubscribe links will be opened 10 at a time')
             counter = 0
@@ -291,7 +291,7 @@ class AutoUnsubscriber():
     '''
 
     def deleteEmails(self):
-        if self.delEmails != True:
+        if not self.delEmails:
             print('\nNo emails selected to delete')
         else:
             print('\nLogging into email server to delete emails')
