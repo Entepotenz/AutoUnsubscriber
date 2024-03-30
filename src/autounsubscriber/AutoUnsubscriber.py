@@ -65,7 +65,7 @@ class AutoUnsubscriber:
     # Get initial user info - email, password, and service provider
     def getInfo(self):
         print(
-            "This program searchs your email for junk mail to unsubscribe from and list the links to unsubscribe"
+            "This program searches your email for junk mail to unsubscribe from and list the links to unsubscribe"
         )
         print("Supported emails: Gmail, Outlook, Hotmail, Yahoo, AOL, Zoho,")
         print("GMX, AT&T, Comcast, ProtonMail (Bridge), and Verizon")
