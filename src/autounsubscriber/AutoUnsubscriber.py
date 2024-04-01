@@ -127,7 +127,7 @@ class AutoUnsubscriber:
             self.get_info()
         attempt = self.login(readonly)
         if not attempt:
-            self.newEmail()
+            self.new_email()
             self.access_server(readonly)
 
     # Search for emails with unsubscribe in the body. If sender not already in
@@ -187,41 +187,33 @@ class AutoUnsubscriber:
                     )
                 else:
                     print("No link found")
-                    notInList = True
+                    not_in_list = True
                     for noLinkers in self.noLinkList:
                         if sender[0][1] in noLinkers:
-                            notInList = False
-                    if notInList:
+                            not_in_list = False
+                    if not_in_list:
                         self.noLinkList.append([sender[0][0], sender[0][1]])
         print("\nLogging out of email server\n")
         self.imap.logout()
 
     # Display info about which providers links were/were not found for
-    def displayEmailInfo(self):
+    def display_email_info(self):
         if self.noLinkList:
             print("Could not find unsubscribe links from these senders:")
-            noList = "| "
+            no_list = "| "
             for i in range(len(self.noLinkList)):
-                noList += str(self.noLinkList[i][0]) + " | "
-            print(noList)
+                no_list += str(self.noLinkList[i][0]) + " | "
+            print(no_list)
         if self.senderList:
             print("\nFound unsubscribe links from these senders:")
-            fullList = "| "
+            full_list = "| "
             for i in range(len(self.senderList)):
-                fullList += str(self.senderList[i][0]) + " | "
-            print(fullList)
+                full_list += str(self.senderList[i][0]) + " | "
+            print(full_list)
 
     # Allow user to decide which unsubscribe links to follow/emails
     def decisions(self):
-        def choice(userInput):
-            if userInput.lower() == "y":
-                return True
-            elif userInput.lower() == "n":
-                return False
-            else:
-                return None
-
-        self.displayEmailInfo()
+        self.display_email_info()
         print("\nYou may now decide which emails to unsubscribe from")
         print("Navigating to unsubscribe links may not automatically unsubscribe you")
         for j in range(len(self.senderList)):
@@ -229,7 +221,7 @@ class AutoUnsubscriber:
             self.goToLinks = True
 
     # Navigate to selected unsubscribe, 10 at a time
-    def openLinks(self):
+    def open_links(self):
         if not self.goToLinks:
             print("\nNo unsubscribe links selected to navigate to")
         else:
@@ -246,23 +238,23 @@ class AutoUnsubscriber:
 
     # For re-running on same email. Clear lists, reset flags, but use same info
     # for email, password, email provider, etc.
-    def runAgain(self):
+    def run_again(self):
         self.goToLinks = False
         self.delEmails = False
         self.senderList = []
         self.noLinkList = []
 
     # Reset everything to get completely new user info
-    def newEmail(self):
+    def new_email(self):
         self.email = ""
         self.user = None
         self.password = ""
         self.imap = None
-        self.runAgain()
+        self.run_again()
 
     # Called after program has run, allow user to run again on same email, run
     # on a different email, or quit the program
-    def nextMove(self):
+    def next_move(self):
         print(
             "\nRun this program again on the same email, a different email, or quit?\n"
         )
@@ -272,11 +264,11 @@ class AutoUnsubscriber:
             again = input("Press 'Q' to quit: ")
             if again.lower() == "a":
                 print("\nRunning program again for " + str(self.email) + "\n")
-                self.runAgain()
+                self.run_again()
                 return True
             elif again.lower() == "d":
                 print("\nPreparing program to run on a different email address\n")
-                self.newEmail()
+                self.new_email()
                 return False
             elif again.lower() == "q":
                 print("\nSo long, space cowboy!\n")
@@ -285,26 +277,26 @@ class AutoUnsubscriber:
                 print("\nInvalid choice, please enter 'A', 'D' or 'Q'.\n")
 
     # Full set of program commands. Works whether it has user info or not
-    def fullProcess(self):
+    def full_process(self):
         self.access_server()
         self.get_emails()
         if self.senderList:
             self.decisions()
-            self.openLinks()
+            self.open_links()
         else:
             print("No unsubscribe links detected")
 
     # Loop to run program and not quit until told to by user or closed
-    def usageLoop(self):
-        self.fullProcess()
+    def usage_loop(self):
+        self.full_process()
         while True:
-            self.nextMove()
-            self.fullProcess()
+            self.next_move()
+            self.full_process()
 
 
 def main():
-    Auto = AutoUnsubscriber()
-    Auto.usageLoop()
+    auto = AutoUnsubscriber()
+    auto.usage_loop()
 
 
 if __name__ == "__main__":
