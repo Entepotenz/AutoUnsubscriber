@@ -106,7 +106,9 @@ class AutoUnsubscriber:
             logging.info("Log in successful")
             return True
         except:
-            logging.error("An error occurred while attempting to log in, please try again")
+            logging.error(
+                "An error occurred while attempting to log in, please try again"
+            )
             return False
 
     # Attempt to log in to server. On failure, force user to re-enter info
@@ -203,7 +205,9 @@ class AutoUnsubscriber:
     def decisions(self):
         self.display_email_info()
         logging.info("You may now decide which emails to unsubscribe from")
-        logging.info("Navigating to unsubscribe links may not automatically unsubscribe you")
+        logging.info(
+            "Navigating to unsubscribe links may not automatically unsubscribe you"
+        )
         for j in range(len(self.senderList)):
             self.senderList[j][3] = True
             self.goToLinks = True
