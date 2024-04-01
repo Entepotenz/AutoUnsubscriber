@@ -30,7 +30,7 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         with:
           python-version: ${{ matrix.python-version }}
-      - name: reformat code
+      - name: Run MyPy
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           python -m pip install --upgrade pip
