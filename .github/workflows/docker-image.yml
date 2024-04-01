@@ -12,7 +12,8 @@ on:
     - cron: "5 4 * * 0" # At 04:05 on Sunday
   push:
     branches:
-      - "**"
+      - main
+      - master
     tags:
       - "v*.*.*"
   pull_request:
