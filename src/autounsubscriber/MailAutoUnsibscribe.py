@@ -3,8 +3,11 @@ import string
 
 import bs4
 import click
+import dateutil
 import pyzmail
 from imapclient import imapclient
+
+logging.basicConfig(level=logging.INFO)
 
 
 @click.command()
@@ -34,7 +37,10 @@ def main(email: str, password: str, imap_server: str, port: int):
 
     data = get_mails_with_detected_keywords(imap_session, detection_keywords)
 
-    group_by_mail_sender_name(data)
+    data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
+
+    for key, value in data_grouped.items():
+        logging.info(f'{key[0]} - {key[1]} - {value[0]["url"]}')
 
     imap_session.logout()
 
@@ -88,20 +94,32 @@ def get_mails_with_detected_keywords(
                         url = item.get("href")
                         if url.strip():
                             uids_with_details[uid] = {
+                                "uid": uid,
                                 "url": url,
                                 "from": msg.get_addresses("from"),
-                                "date": msg.get_decoded_header("date"),
+                                "date": dateutil.parser.parse(
+                                    msg.get_decoded_header("date")
+                                ),
                             }
-
+                            break
         else:
             logging.error("Odd Email at UID: " + str(uid) + "; SKIPPING....")
 
     return uids_with_details
 
 
-def group_by_mail_sender_name(data):
-    # TODO
-    pass
+def group_by_mail_sender_name_and_sorted_by_date(data):
+    result = {}
+
+    for key, value in data.items():
+        if value["from"][0] not in result.keys():
+            result[value["from"][0]] = []
+        result[value["from"][0]].append(value)
+
+    for key in result.keys():
+        result[key] = sorted(result[key], key=lambda x: x["date"], reverse=True)
+
+    return result
 
 
 if __name__ == "__main__":
