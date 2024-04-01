@@ -1,0 +1,11 @@
+{
+  "threshold": 0,
+  "reporters": ["markdown"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/.venv/**",
+    "requirements.txt",
+    "requirements-dev.txt"
+  ]
+}
