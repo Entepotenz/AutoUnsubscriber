@@ -1,10 +1,9 @@
-#! python3
+#!/usr/bin/env python3
 
 import pyzmail
 import imapclient
 import bs4
 import getpass
-import webbrowser
 import re
 import sys
 import ssl
@@ -46,6 +45,7 @@ WORDS = ["unsubscribe", "subscription", "optout", "abbestellen", "abmelden"]
 
 class AutoUnsubscriber:
     def __init__(self):
+        self.context = None
         self.words = WORDS
         self.email = ""
         self.user = None
@@ -63,15 +63,15 @@ class AutoUnsubscriber:
         # company name different than their domain name...
 
     # Get initial user info - email, password, and service provider
-    def getInfo(self):
+    def get_info(self):
         print(
             "This program searches your email for junk mail to unsubscribe from and list the links to unsubscribe"
         )
         print("Supported emails: Gmail, Outlook, Hotmail, Yahoo, AOL, Zoho,")
         print("GMX, AT&T, Comcast, ProtonMail (Bridge), and Verizon")
         print("Please note: you may need to allow access to less secure apps")
-        getEmail = True
-        while getEmail:
+        get_email = True
+        while get_email:
             self.email = str.lower(input("\nEnter your email address: "))
             for prov in serverD:
                 match = False
@@ -79,7 +79,7 @@ class AutoUnsubscriber:
                     if domain in self.email:
                         print("\nLooks like you're using a " + prov + " account\n")
                         self.user = (prov, serverD[prov]["imap"])
-                        getEmail = False
+                        get_email = False
                         match = True
                         break
                 if match:
@@ -92,7 +92,7 @@ class AutoUnsubscriber:
                 if myimap:
                     self.user = ("Self-defined IMAP", myimap)
                     print("\nYou are using a " + self.user[0] + " account!\n")
-                    getEmail = False
+                    get_email = False
                     break
                 print("\nTry a different account")
         self.password = getpass.getpass("Enter password for " + self.email + ": ")
@@ -122,53 +122,53 @@ class AutoUnsubscriber:
             return False
 
     # Attempt to log in to server. On failure, force user to re-enter info
-    def accessServer(self, readonly=True):
+    def access_server(self, readonly=True):
         if self.email == "":
-            self.getInfo()
+            self.get_info()
         attempt = self.login(readonly)
         if not attempt:
             self.newEmail()
-            self.accessServer(readonly)
+            self.access_server(readonly)
 
     # Search for emails with unsubscribe in the body. If sender not already in
     # senderList, parse email for unsubscribe link. If link found, add name, email,
     # link (plus metadata for decisions) to senderList. If not, add to noLinkList.
-    def getEmails(self):
+    def get_emails(self):
         print("Getting emails with unsubscribe in the body\n")
-        UIDs = self.imap.search(["TEXT", "unsubscribe"])
-        raw = self.imap.fetch(UIDs, ["BODY[]"])
+        uid_list = self.imap.search(["TEXT", "unsubscribe"])
+        raw = self.imap.fetch(uid_list, ["BODY[]"])
         print("Getting links and addresses\n")
-        for UID in UIDs:
+        for uid in uid_list:
             # If Body exists (resolves weird error with empty body emails from Yahoo),
             # then Get address and check if sender already in senderList
-            if b"BODY[]" in raw[UID]:
-                msg = pyzmail.PyzMessage.factory(raw[UID][b"BODY[]"])
+            if b"BODY[]" in raw[uid]:
+                msg = pyzmail.PyzMessage.factory(raw[uid][b"BODY[]"])
             else:
-                print("Odd Email at UID: " + str(UID) + "; SKIPPING....")
+                print("Odd Email at UID: " + str(uid) + "; SKIPPING....")
                 continue
             sender = msg.get_addresses("from")
-            trySender = True
+            try_sender = True
             for spammers in self.senderList:
                 if sender[0][1] in spammers:
-                    trySender = False
+                    try_sender = False
             # If not, search for link
-            if trySender:
+            if try_sender:
                 # Encode and decode to cp437 to handle unicode errors and get
                 # rid of characters that can't be printed by Windows command line
                 # which has default setting of cp437
-                senderName = sender[0][0].encode("cp437", "ignore")
-                senderName = senderName.decode("cp437")
-                print("Searching for unsubscribe link from " + str(senderName))
+                sender_name = sender[0][0].encode("cp437", "ignore")
+                sender_name = sender_name.decode("cp437")
+                print("Searching for unsubscribe link from " + str(sender_name))
                 url = False
                 # Parse html for elements with anchor tags
                 if html_piece := msg.html_part:
                     html = html_piece.get_payload().decode("utf-8", errors="replace")
                     soup = bs4.BeautifulSoup(html, "html.parser")
-                    elems = soup.select("a")
+                    elements = soup.select("a")
                     # For each anchor tag, use regex to search for keywords
-                    elems.reverse()
+                    elements.reverse()
                     # search starting at the bottom of email
-                    for elem in elems:
+                    for elem in elements:
                         current_element = str(elem).lower()
                         for word in self.words:
                             # If one is found, get the url
@@ -183,7 +183,7 @@ class AutoUnsubscriber:
                 # If no link found, add to noLinkList
                 if url:
                     self.senderList.append(
-                        [senderName, sender[0][1], url, False, False]
+                        [sender_name, sender[0][1], url, False, False]
                     )
                 else:
                     print("No link found")
@@ -286,8 +286,8 @@ class AutoUnsubscriber:
 
     # Full set of program commands. Works whether it has user info or not
     def fullProcess(self):
-        self.accessServer()
-        self.getEmails()
+        self.access_server()
+        self.get_emails()
         if self.senderList:
             self.decisions()
             self.openLinks()
