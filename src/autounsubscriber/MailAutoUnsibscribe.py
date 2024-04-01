@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 )
 def main(email: str, password: str, imap_server: str, port: int):
     click.echo("Email address: {}".format(email))
-    click.echo("Password: {}".format("*" * len(password)))  # Masking password
+    click.echo("Password: {}".format("*" * len(password)))
     click.echo("IMAP server: {}".format(imap_server))
     click.echo("Port: {}".format(port))
 
