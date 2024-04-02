@@ -1,10 +1,9 @@
 import logging
-import string
 
 import bs4
 import click
-import dateutil
 import pyzmail
+from dateutil import parser as dateutil_parser
 from imapclient import imapclient
 
 logging.basicConfig(level=logging.INFO)
@@ -66,7 +65,7 @@ def login(
 
 
 def get_mails_with_detected_keywords(
-    imap_session: imapclient.IMAPClient, detection_keywords: [string]
+    imap_session: imapclient.IMAPClient, detection_keywords: list[str]
 ):
     imap_session.select_folder("INBOX", readonly=True)
 
@@ -75,11 +74,11 @@ def get_mails_with_detected_keywords(
         messages = imap_session.search(["TEXT", keyword])
         detection_results[keyword] = messages
 
-    merged_uid_list = set()
+    merged_uid_list: set[int] = set()
     for item in detection_results.values():
         merged_uid_list = set(item).union(merged_uid_list)
 
-    uids_with_details: {string: {}} = {}
+    uids_with_details: dict[int, dict] = {}
 
     messages_raw = imap_session.fetch(merged_uid_list, ["BODY[]"])
     for uid in merged_uid_list:
@@ -105,7 +104,7 @@ def get_mails_with_detected_keywords(
                                 "uid": uid,
                                 "url": url,
                                 "from": msg.get_addresses("from"),
-                                "date": dateutil.parser.parse(
+                                "date": dateutil_parser.parse(
                                     msg.get_decoded_header("date")
                                 ),
                             }
