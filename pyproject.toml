@@ -17,6 +17,7 @@ python-dateutil = "^2.9.0.post0"
 black = "^24.3.0"
 mypy = "^1.9.0"
 types-beautifulsoup4 = "^4.12.0.20240229"
+types-python-dateutil = "^2.9.0.20240316"
 
 [build-system]
 requires = ["poetry-core"]
