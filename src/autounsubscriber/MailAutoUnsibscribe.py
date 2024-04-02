@@ -20,7 +20,11 @@ logging.basicConfig(level=logging.INFO)
     "--port", prompt="Port number", default=993, help="Port number for IMAP server"
 )
 @click.option(
-    "--no-tls", is_flag=True, prompt="Deactivate TLS", default=False, help="Deactivate TLS for communication with IMAP server"
+    "--no-tls",
+    is_flag=True,
+    prompt="Deactivate TLS",
+    default=False,
+    help="Deactivate TLS for communication with IMAP server",
 )
 def main(email: str, password: str, imap_server: str, port: int, no_tls: bool):
     click.echo("Email address: {}".format(email))
