@@ -19,13 +19,17 @@ logging.basicConfig(level=logging.INFO)
 @click.option(
     "--port", prompt="Port number", default=993, help="Port number for IMAP server"
 )
-def main(email: str, password: str, imap_server: str, port: int):
+@click.option(
+    "--no-tls", is_flag=True, prompt="Deactivate TLS", default=False, help="Deactivate TLS for communication with IMAP server"
+)
+def main(email: str, password: str, imap_server: str, port: int, no_tls: bool):
     click.echo("Email address: {}".format(email))
     click.echo("Password: {}".format("*" * len(password)))  # Masking password
     click.echo("IMAP server: {}".format(imap_server))
     click.echo("Port: {}".format(port))
+    click.echo("No-TLS: {}".format(no_tls))
 
-    imap_session = login(email, password, imap_server, port)
+    imap_session = login(email, password, imap_server, port, not no_tls)
 
     detection_keywords = [
         "unsubscribe",
@@ -46,10 +50,10 @@ def main(email: str, password: str, imap_server: str, port: int):
 
 
 def login(
-    email: str, password: str, imap_server: str, port: int
+    email: str, password: str, imap_server: str, port: int, tls: bool
 ) -> imapclient.IMAPClient:
     try:
-        imap = imapclient.IMAPClient(imap_server, port=port, ssl=True)
+        imap = imapclient.IMAPClient(imap_server, port=port, ssl=tls)
         imap.login(email, password)
         logging.info("Log in successful")
         return imap

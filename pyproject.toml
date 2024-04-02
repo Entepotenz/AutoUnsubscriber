@@ -6,7 +6,7 @@ authors = ["F.K. <19738301+Entepotenz@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 bs4 = "^0.0.2"
 imapclient = "^3.0.1"
 pyzmail39 = "^0.0.2"
