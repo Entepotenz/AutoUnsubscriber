@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO)
     default=False,
     help="Deactivate TLS for communication with IMAP server",
 )
-def main(email: str, password: str, imap_server: str, port: int, no_tls: bool):
+def main(email: str, password: str, imap_server: str, port: int, no_tls: bool) -> None:
     click.echo("Email address: {}".format(email))
     click.echo("Password: {}".format("*" * len(password)))  # Masking password
     click.echo("IMAP server: {}".format(imap_server))
