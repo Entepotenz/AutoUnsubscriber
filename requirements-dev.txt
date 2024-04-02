@@ -87,6 +87,9 @@ six==1.16.0 ; python_version >= "3.10" and python_version < "4.0" \
 soupsieve==2.5 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:5663d5a7b3bfaeee0bc4372e7fc48f9cff4940b3eec54a6451cc5299f1097690 \
     --hash=sha256:eaa337ff55a1579b6549dc679565eac1e3d000563bcb1c8ab0d0fefbc0c2cdc7
+tomli==2.0.1 ; python_version >= "3.10" and python_version < "3.11" \
+    --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
+    --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
 types-beautifulsoup4==4.12.0.20240229 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:000cdddb8aee4effb45a04be95654de8629fb8594a4f2f1231cff81108977324 \
     --hash=sha256:e37e4cfa11b03b01775732e56d2c010cb24ee107786277bae6bc0fa3e305b686
