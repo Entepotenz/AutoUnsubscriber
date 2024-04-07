@@ -1,4 +1,5 @@
 import logging
+import typing
 from datetime import datetime
 
 import bs4
@@ -79,7 +80,7 @@ def login(
 
 def get_mails_with_detected_keywords(
     imap_session: imapclient.IMAPClient, detection_keywords: list[str]
-) -> dict[int, dict[str, any]]:
+) -> dict[int, dict[str, typing.Any]]:
     if not imap_session.folder_exists("INBOX"):
         logging.warning("'INBOX' folder does not exist!")
     logging.debug("%s", imap_session.list_folders())
@@ -104,7 +105,7 @@ def get_mails_with_detected_keywords(
         all_uids_in_inbox = imap_session.search()
         merged_uid_list = list(set(all_uids_in_inbox))
 
-    uids_with_details: dict[int, dict[str, any]] = {}
+    uids_with_details: dict[int, dict[str, typing.Any]] = {}
 
     chunk_size = 10
     chunks = [
@@ -224,9 +225,9 @@ def get_message_from_and_date(
 
 
 def group_by_mail_sender_name_and_sorted_by_date(
-    data: dict[int, dict[str, any]]
-) -> dict[str, list[dict[str, any]]]:
-    result: dict[str, list[dict[str, any]]] = {}
+    data: dict[int, dict[str, typing.Any]]
+) -> dict[str, list[dict[str, typing.Any]]]:
+    result: dict[str, list[dict[str, typing.Any]]] = {}
 
     for key, value in data.items():
         current_key = value["from"][0]
