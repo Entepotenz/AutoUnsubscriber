@@ -60,7 +60,7 @@ def main(email: str, password: str, imap_server: str, port: int, tls: bool) -> N
         data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
 
         for key, value in data_grouped.items():
-            logging.info(f'{key} - {value[0]["from"][0][1]} - {value[0]["url"]}')
+            logging.info(f'{key} - {value[0]["from"][1]} - {value[0]["url"]}')
 
 
 def login(
@@ -88,7 +88,7 @@ def get_mails_with_detected_keywords(
     is_imap_search_supported = is_imap_server_supporting_search_capability(imap_session)
 
     detection_results = {}
-    merged_uid_list: set[int] = set()
+    merged_uid_list: list[int] = list()
 
     if is_imap_search_supported:
         for keyword in detection_keywords:
@@ -96,30 +96,56 @@ def get_mails_with_detected_keywords(
             detection_results[keyword] = messages
 
         for item in detection_results.values():
-            merged_uid_list = set(item).union(merged_uid_list)
+            merged_uid_list = list(set(item).union(set(merged_uid_list)))
     else:
         logging.warning(
             "IMAP server does not support 'search' -> falling back to downloading messages (this can take some time)"
         )
         all_uids_in_inbox = imap_session.search()
-        merged_uid_list = set(all_uids_in_inbox)
+        merged_uid_list = list(set(all_uids_in_inbox))
 
     uids_with_details: dict[int, dict[str, any]] = {}
 
-    messages_raw = imap_session.fetch(merged_uid_list, ["BODY[]"])
-    for uid in merged_uid_list:
-        if is_message_keyword_hit(messages_raw[uid], detection_keywords, uid):
-            urls = get_unsubscribe_urls(messages_raw[uid], detection_keywords)
-            if urls:
-                (message_from, message_date) = get_message_from_and_date(
-                    messages_raw[uid]
-                )
-                uids_with_details[uid] = {
-                    "uid": uid,
-                    "url": urls,
-                    "from": message_from,
-                    "date": message_date,
-                }
+    chunk_size = 10
+    chunks = [
+        merged_uid_list[x : x + chunk_size]
+        for x in range(0, len(merged_uid_list), chunk_size)
+    ]
+
+    for chunk in chunks:
+        messages_raw = dict()
+        try:
+            messages_raw = imap_session.fetch(chunk, ["BODY[]"])
+        except imapclient.exceptions.IMAPClientError as error:
+            logging.warning(
+                "encountered error while fetching uid: %s; error message: '%s'",
+                ",".join(map(str, chunk)),
+                error,
+            )
+            for uid in chunk:
+                try:
+                    messages_raw[uid] = imap_session.fetch([uid], ["BODY[]"])
+                except imapclient.exceptions.IMAPClientError as error:
+                    logging.error(
+                        "encountered error while fetching uid: %d; we will SKIP this uid; error message: '%s'",
+                        uid,
+                        error,
+                    )
+        for uid in chunk:
+            if uid in messages_raw and is_message_keyword_hit(
+                messages_raw[uid], detection_keywords, uid
+            ):
+                urls = get_unsubscribe_urls(messages_raw[uid], detection_keywords)
+                if urls:
+                    (message_from, message_date) = get_message_from_and_date(
+                        messages_raw[uid]
+                    )
+                    uids_with_details[uid] = {
+                        "uid": uid,
+                        "url": urls,
+                        "from": message_from,
+                        "date": message_date,
+                    }
 
     return uids_with_details
 
@@ -148,7 +174,10 @@ def is_message_keyword_hit(
         return False
 
     msg: pyzmail.PyzMessage = pyzmail.PyzMessage.factory(raw_message[b"BODY[]"])
-    message_content = msg.html_part.get_payload().decode("utf-8", errors="replace")
+    if msg.html_part:
+        message_content = msg.html_part.get_payload().decode("utf-8", errors="replace")
+    else:
+        message_content = msg.text_part.get_payload().decode("utf-8", errors="replace")
 
     # check if we can discard the message early because it does not have any keyword hit
     message_content_contains_any_keyword = False
@@ -184,10 +213,12 @@ def get_unsubscribe_urls(
     return results
 
 
-def get_message_from_and_date(raw_message: dict[bytes, bytes]) -> tuple[str, datetime]:
+def get_message_from_and_date(
+    raw_message: dict[bytes, bytes]
+) -> tuple[tuple, datetime]:
     msg: pyzmail.PyzMessage = pyzmail.PyzMessage.factory(raw_message[b"BODY[]"])
     return (
-        msg.get_addresses("from"),
+        tuple(map(lambda element: element.strip(), msg.get_addresses("from")[0])),
         dateutil_parser.parse(msg.get_decoded_header("date")),
     )
 
@@ -198,7 +229,7 @@ def group_by_mail_sender_name_and_sorted_by_date(
     result: dict[str, list[dict[str, any]]] = {}
 
     for key, value in data.items():
-        current_key = value["from"][0][0]
+        current_key = value["from"][0]
         if current_key not in result.keys():
             result[current_key] = []
         result[current_key].append(value)
