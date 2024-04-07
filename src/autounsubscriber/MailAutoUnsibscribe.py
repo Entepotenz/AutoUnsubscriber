@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Set, List, Dict
+from typing import Any, Dict, List
 
 import bs4
 import click
