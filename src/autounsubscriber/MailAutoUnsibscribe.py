@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Set, List, Dict
 
 import bs4
 import click
@@ -9,30 +10,41 @@ from imapclient import imapclient
 logging.basicConfig(level=logging.INFO)
 
 
-@click.command()
-@click.option("--email", prompt="Your email address", help="Your email address")
-@click.option(
-    "--password", prompt="Your password", hide_input=True, help="Your password"
+@click.command()  # type: ignore
+@click.option(  # type: ignore
+    "--email", prompt="Your email address", help="Your email address", type=click.STRING
 )
-@click.option("--imap-server", prompt="IMAP server name", help="IMAP server name")
-@click.option(
-    "--port", prompt="Port number", default=993, help="Port number for IMAP server"
+@click.option(  # type: ignore
+    "--password",
+    prompt="Your password",
+    hide_input=True,
+    help="Your password",
+    type=click.STRING,
 )
-@click.option(
-    "--no-tls",
-    is_flag=True,
-    prompt="Deactivate TLS",
-    default=False,
-    help="Deactivate TLS for communication with IMAP server",
+@click.option(  # type: ignore
+    "--imap-server",
+    prompt="IMAP server name",
+    help="IMAP server name",
+    type=click.STRING,
 )
-def main(email: str, password: str, imap_server: str, port: int, no_tls: bool) -> None:
+@click.option(  # type: ignore
+    "--port",
+    default=993,
+    help="Port number for IMAP server",
+    type=click.INT,
+)
+@click.option(  # type: ignore
+    "--tls/--no-tls",
+    default=True,
+    help="Enable / Disable TLS for communication with IMAP server",
+    type=click.BOOL,
+)
+def main(email: str, password: str, imap_server: str, port: int, tls: bool) -> None:
     click.echo("Email address: {}".format(email))
     click.echo("Password: {}".format("*" * len(password)))  # Masking password
     click.echo("IMAP server: {}".format(imap_server))
     click.echo("Port: {}".format(port))
-    click.echo("No-TLS: {}".format(no_tls))
-
-    imap_session = login(email, password, imap_server, port, not no_tls)
+    click.echo("TLS: {}".format(tls))
 
     detection_keywords = [
         "unsubscribe",
@@ -42,31 +54,32 @@ def main(email: str, password: str, imap_server: str, port: int, no_tls: bool) -
         "abmelden",
     ]
 
-    data = get_mails_with_detected_keywords(imap_session, detection_keywords)
+    with login(email, password, imap_server, port, tls) as imap_session:
+        data = get_mails_with_detected_keywords(imap_session, detection_keywords)
 
-    data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
+        data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
 
-    for key, value in data_grouped.items():
-        logging.info(f'{key[0]} - {key[1]} - {value[0]["url"]}')
-
-    imap_session.logout()
+        for key, value in data_grouped.items():
+            logging.info(f'{key} - {value[0]["from"][0][1]} - {value[0]["url"]}')
 
 
 def login(
     email: str, password: str, imap_server: str, port: int, tls: bool
 ) -> imapclient.IMAPClient:
     try:
-        imap = imapclient.IMAPClient(imap_server, port=port, ssl=tls)
+        imap = imapclient.IMAPClient(imap_server, port=port, ssl=tls, timeout=30)
         imap.login(email, password)
         logging.info("Log in successful")
         return imap
     except imapclient.exceptions.IMAPClientError as error:
         logging.error("An error occurred while attempting to log in: {}", error)
+    except Exception as error:
+        logging.error("An error occurred while attempting to log in: {}", error)
 
 
 def get_mails_with_detected_keywords(
     imap_session: imapclient.IMAPClient, detection_keywords: list[str]
-):
+) -> dict[int, dict[str, Any]]:
     imap_session.select_folder("INBOX", readonly=True)
 
     detection_results = {}
@@ -78,7 +91,7 @@ def get_mails_with_detected_keywords(
     for item in detection_results.values():
         merged_uid_list = set(item).union(merged_uid_list)
 
-    uids_with_details: dict[int, dict] = {}
+    uids_with_details: dict[int, dict[str, Any]] = {}
 
     messages_raw = imap_session.fetch(merged_uid_list, ["BODY[]"])
     for uid in merged_uid_list:
@@ -115,13 +128,16 @@ def get_mails_with_detected_keywords(
     return uids_with_details
 
 
-def group_by_mail_sender_name_and_sorted_by_date(data):
-    result = {}
+def group_by_mail_sender_name_and_sorted_by_date(
+    data: Dict[int, Dict[str, Any]]
+) -> Dict[str, List[Dict[str, Any]]]:
+    result: Dict[str, List[Dict[str, Any]]] = {}
 
     for key, value in data.items():
-        if value["from"][0] not in result.keys():
-            result[value["from"][0]] = []
-        result[value["from"][0]].append(value)
+        current_key = value["from"][0][0]
+        if current_key not in result.keys():
+            result[current_key] = []
+        result[current_key].append(value)
 
     for key in result.keys():
         result[key] = sorted(result[key], key=lambda x: x["date"], reverse=True)
