@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.12-alpine@sha256:c7eb5c92b7933fe52f224a91a1ced27b91840ac9c69c58bef40d602156bcdb41 as build
+FROM docker.io/library/python:3.12-alpine@sha256:ef097620baf1272e38264207003b0982285da3236a20ed829bf6bbf1e85fe3cb as build
 
 RUN apk update && apk add --no-cache build-base libffi-dev
 WORKDIR /usr/app
@@ -7,7 +7,7 @@ ENV PATH="/usr/app/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM docker.io/library/python:3.12-alpine@sha256:c7eb5c92b7933fe52f224a91a1ced27b91840ac9c69c58bef40d602156bcdb41
+FROM docker.io/library/python:3.12-alpine@sha256:ef097620baf1272e38264207003b0982285da3236a20ed829bf6bbf1e85fe3cb
 
 RUN addgroup -S python && adduser -S python -G python
 
