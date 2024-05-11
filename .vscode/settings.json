@@ -1,0 +1,20 @@
+{
+  "editor.formatOnSave": true,
+  "cSpell.language": "en,de,de-DE",
+  "cSpell.enableFiletypes": ["*"],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "black-formatter.importStrategy": "fromEnvironment",
+  "isort.importStrategy": "fromEnvironment",
+  "isort.args": ["--profile", "black"],
+  "flake8.importStrategy": "fromEnvironment"
+}
