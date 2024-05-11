@@ -6,18 +6,18 @@ authors = ["F.K. <19738301+Entepotenz@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-bs4 = "^0.0.2"
-imapclient = "^3.0.1"
-pyzmail39 = "^0.0.2"
-click = "^8.1.7"
-python-dateutil = "^2.9.0.post0"
+python = "^3.12"
+bs4 = "0.0.2"
+imapclient = "3.0.1"
+pyzmail39 = "0.0.2"
+click = "8.1.7"
+python-dateutil = "2.9.0.post0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.3.0"
-mypy = "^1.9.0"
-types-beautifulsoup4 = "^4.12.0.20240229"
-types-python-dateutil = "^2.9.0.20240316"
+black = "24.4.2"
+mypy = "1.10.0"
+types-beautifulsoup4 = "4.12.0.20240511"
+types-python-dateutil = "2.9.0.20240316"
 
 [build-system]
 requires = ["poetry-core"]
