@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigests",
+    "regexManagers:dockerfileVersions",
+    "security:openssf-scorecard"
+  ],
+  "enabledManagers": [
+    "custom.regex",
+    "docker-compose",
+    "dockerfile",
+    "github-actions",
+    "pep621",
+    "pip_requirements",
+    "poetry"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["run-.+.sh"],
+      "matchStrings": [
+        "DOCKER_IMAGE=\"(?<depName>.*?):(?<currentValue>.*?)@(?<currentDigest>sha256:[a-f0-9]+)\""
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
