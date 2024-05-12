@@ -43,6 +43,7 @@ jobs:
   megalinter:
     name: MegaLinter
     runs-on: ubuntu-latest
+    if: (!startsWith(github.event.pull_request.head.ref, 'dependabot/') && !startsWith(github.event.pull_request.head.ref, 'renovate/') && github.event.head_commit.author.username != 'renovate-bot')
 
     # Give the default GITHUB_TOKEN write permission to commit and push, comment
     # issues & post new PR; remove the ones you do not need
@@ -54,7 +55,7 @@ jobs:
     steps:
       # Git Checkout
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
@@ -67,7 +68,7 @@ jobs:
 
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter/flavors/ci_light@v7.10.0
+        uses: oxsecurity/megalinter/flavors/ci_light@v7.11.1
 
         id: ml
 
@@ -99,7 +100,7 @@ jobs:
 
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: success() || failure()
         with:
           name: MegaLinter reports
@@ -138,7 +139,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from same repository, not from forks)
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90e484f2984215f83e # v6.0.5
         id: cpr
         if: env.APPLY_FIXES_IF_PR == 'true'
         with:
@@ -160,7 +161,7 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842 # v5.0.1
         if: env.APPLY_FIXES_IF_COMMIT == 'true'
         with:
           branch: >-

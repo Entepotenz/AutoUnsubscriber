@@ -12,6 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: (!startsWith(github.event.pull_request.head.ref, 'dependabot/') && !startsWith(github.event.pull_request.head.ref, 'renovate/') && github.event.head_commit.author.username != 'renovate-bot')
     permissions:
       contents: read
       checks: write
@@ -19,7 +20,7 @@ jobs:
       matrix:
         python-version: ["3"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Get changed files
         id: changed-files-specific
         uses: tj-actions/changed-files@20576b4b9ed46d41e2d45a2256e5e2316dde6834 # v43.0.1
