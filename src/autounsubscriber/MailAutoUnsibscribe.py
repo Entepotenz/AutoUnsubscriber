@@ -7,6 +7,7 @@ import click
 import pyzmail
 from dateutil import parser as dateutil_parser
 from imapclient import imapclient
+import ssl as ssl_lib
 
 logging.basicConfig(level=logging.INFO)
 
@@ -40,12 +41,26 @@ logging.basicConfig(level=logging.INFO)
     help="Enable / Disable TLS for communication with IMAP server",
     type=click.BOOL,
 )
-def main(email: str, password: str, imap_server: str, port: int, tls: bool) -> None:
+@click.option(  # type: ignore
+    "--tls-certificate-validation/--no-tls-certificate-validation",
+    default=True,
+    help="Enable / Disable TLS validation of server certificate",
+    type=click.BOOL,
+)
+def main(
+    email: str,
+    password: str,
+    imap_server: str,
+    port: int,
+    tls: bool,
+    tls_certificate_validation: bool,
+) -> None:
     click.echo("Email address: {}".format(email))
     click.echo("Password: {}".format("*" * len(password)))  # Masking password
     click.echo("IMAP server: {}".format(imap_server))
     click.echo("Port: {}".format(port))
     click.echo("TLS: {}".format(tls))
+    click.echo("TLS-CERTIFICATE-VALIDATION: {}".format(tls_certificate_validation))
 
     detection_keywords = [
         "unsubscribe",
@@ -55,7 +70,9 @@ def main(email: str, password: str, imap_server: str, port: int, tls: bool) -> N
         "abmelden",
     ]
 
-    with login(email, password, imap_server, port, tls) as imap_session:
+    with login(
+        email, password, imap_server, port, tls, tls_certificate_validation
+    ) as imap_session:
         data = get_mails_with_detected_keywords(imap_session, detection_keywords)
 
         data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
@@ -65,10 +82,23 @@ def main(email: str, password: str, imap_server: str, port: int, tls: bool) -> N
 
 
 def login(
-    email: str, password: str, imap_server: str, port: int, tls: bool
+    email: str,
+    password: str,
+    imap_server: str,
+    port: int,
+    tls: bool,
+    tls_certificate_validation: bool,
 ) -> imapclient.IMAPClient:
     try:
-        imap = imapclient.IMAPClient(imap_server, port=port, ssl=tls, timeout=30)
+        ssl_context = None
+        if not tls_certificate_validation:
+            ssl_context = ssl_lib.SSLContext()
+            ssl_context.verify_mode = ssl_lib.CERT_NONE
+            ssl_context.check_hostname = False
+
+        imap = imapclient.IMAPClient(
+            imap_server, port=port, ssl=tls, timeout=30, ssl_context=ssl_context
+        )
         imap.login(email, password)
         logging.info("Log in successful")
         return imap
