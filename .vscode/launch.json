@@ -11,9 +11,9 @@
       "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
       "console": "integratedTerminal",
       "env": {
-        "PYTHONUNBUFFERED": "1",
+        "PYTHONUNBUFFERED": "1"
       },
-      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_1.env",
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_1.env"
     },
     {
       "name": "Run - 2",
@@ -22,9 +22,9 @@
       "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
       "console": "integratedTerminal",
       "env": {
-        "PYTHONUNBUFFERED": "1",
+        "PYTHONUNBUFFERED": "1"
       },
-      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_2.env",
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_2.env"
     },
     {
       "name": "Run - 3 - local mail server",
@@ -33,9 +33,9 @@
       "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
       "console": "integratedTerminal",
       "env": {
-        "PYTHONUNBUFFERED": "1",
+        "PYTHONUNBUFFERED": "1"
       },
-      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_3.env",
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_3.env"
     }
   ]
 }

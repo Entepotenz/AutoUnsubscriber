@@ -1,9 +1,7 @@
 {
   "editor.formatOnSave": true,
   "cSpell.language": "en,de,de-DE",
-  "cSpell.enableFiletypes": [
-    "*"
-  ],
+  "cSpell.enableFiletypes": ["*"],
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
@@ -21,17 +19,10 @@
   },
   "black-formatter.importStrategy": "fromEnvironment",
   "isort.importStrategy": "fromEnvironment",
-  "isort.args": [
-    "--profile",
-    "black"
-  ],
+  "isort.args": ["--profile", "black"],
   "flake8.importStrategy": "fromEnvironment",
-  "cSpell.words": [
-    "dateutil"
-  ],
-  "python.testing.pytestArgs": [
-    "src"
-  ],
+  "cSpell.words": ["dateutil"],
+  "python.testing.pytestArgs": ["src"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
+  "python.testing.pytestEnabled": true
 }
