@@ -8,6 +8,10 @@ services:
       - "127.0.0.1:25:25"
       - "127.0.0.1:143:143"
       - "127.0.0.1:993:993"
+    # make container service available to vscode devcontainer:
+    # https://goledger.medium.com/reaching-hosts-localhost-from-inside-a-vscode-devcontainer-932e1c08df5c
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - MAILNAME=example.org
       - MAIL_ADDRESS=address@example.org

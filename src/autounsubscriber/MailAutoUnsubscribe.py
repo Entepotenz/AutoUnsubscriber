@@ -1,4 +1,5 @@
 import logging
+import ssl as ssl_lib
 import typing
 from datetime import datetime
 
@@ -7,7 +8,6 @@ import click
 import pyzmail
 from dateutil import parser as dateutil_parser
 from imapclient import imapclient
-import ssl as ssl_lib
 
 logging.basicConfig(level=logging.INFO)
 
@@ -77,8 +77,9 @@ def main(
 
         data_grouped = group_by_mail_sender_name_and_sorted_by_date(data)
 
+        click.echo("found this data:")
         for key, value in data_grouped.items():
-            logging.info(f'{key} - {value[0]["from"][1]} - {value[0]["url"]}')
+            click.echo(f'{key} - {value[0]["from"][1]} - {value[0]["url"]}')
 
 
 def login(
@@ -238,7 +239,7 @@ def get_unsubscribe_urls(
         for word in detection_keywords:
             if word.lower() in current_element:
                 url = item.get("href")
-                if url.strip():
+                if url and isinstance(url, str) and url.strip():
                     results.add(url)
 
     return results
@@ -259,17 +260,19 @@ def group_by_mail_sender_name_and_sorted_by_date(
 ) -> dict[str, list[dict[str, typing.Any]]]:
     result: dict[str, list[dict[str, typing.Any]]] = {}
 
-    for key, value in data.items():
+    for _, value in data.items():
         current_key = value["from"][0]
         if current_key not in result.keys():
             result[current_key] = []
         result[current_key].append(value)
 
-    for key in result.keys():
-        result[key] = sorted(result[key], key=lambda x: x["date"], reverse=True)
+    for from_key in result.keys():
+        result[from_key] = sorted(
+            result[from_key], key=lambda x: x["date"], reverse=True
+        )
 
     return result
 
 
 if __name__ == "__main__":
-    main()
+    main(auto_envvar_prefix="AUTO_UNSUBSCRIBE")

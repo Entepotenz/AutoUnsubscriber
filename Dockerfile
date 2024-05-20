@@ -24,4 +24,4 @@ USER python
 
 ENV PATH="/usr/app/venv/bin:$PATH"
 
-CMD [ "python3", "/usr/app/autounsubscriber/MailAutoUnsibscribe.py" ]
+CMD [ "python3", "/usr/app/autounsubscriber/MailAutoUnsubscribe.py" ]
