@@ -13,9 +13,15 @@
   // "forwardPorts": [],
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "poetry install",
+  "containerEnv": {
+    "POETRY_VIRTUALENVS_IN_PROJECT": "true"
+  },
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+      },
       "extensions": [
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
