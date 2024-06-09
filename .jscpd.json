@@ -6,6 +6,7 @@
     "**/.git/**",
     "**/.venv/**",
     "requirements.txt",
-    "requirements-dev.txt"
+    "requirements-dev.txt",
+    ".github/**"
   ]
 }
