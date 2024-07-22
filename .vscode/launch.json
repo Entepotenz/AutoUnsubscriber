@@ -1,0 +1,41 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run - 1",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_1.env"
+    },
+    {
+      "name": "Run - 2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_2.env"
+    },
+    {
+      "name": "Run - 3 - local mail server",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/autounsubscriber/MailAutoUnsubscribe.py",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "envFile": "${workspaceFolder}/.vscode/secrets/run_config_3.env"
+    }
+  ]
+}
