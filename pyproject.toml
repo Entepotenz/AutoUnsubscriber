@@ -17,7 +17,7 @@ pyzmail39 = "^0.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.3.0"
+black = "^24.4.2"
 
 [build-system]
 requires = ["poetry-core"]
