@@ -1,0 +1,3 @@
+[submodule "src/test/docker-imap-devel"]
+	path = src/test/docker-imap-devel
+	url = https://github.com/antespi/docker-imap-devel.git
