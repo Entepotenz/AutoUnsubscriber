@@ -1,0 +1,16 @@
+---
+version: "3.3"
+
+services:
+  imap_test:
+    build: ./docker-imap-devel
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:25:25"
+      - "127.0.0.1:143:143"
+      - "127.0.0.1:993:993"
+    environment:
+      - MAILNAME=example.org
+      - MAIL_ADDRESS=address@example.org
+      - MAIL_PASS=pass
