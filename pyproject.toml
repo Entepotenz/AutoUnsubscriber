@@ -12,7 +12,7 @@ bs4 = "^0.0.2"
 imapclient = "^3.0.1"
 regex = "^2023.12.25"
 syspath = "^3.0.6"
-pyopenssl = "^24.1.0"
+pyopenssl = "^25.0.0"
 pyzmail39 = "^0.0.2"
 
 
